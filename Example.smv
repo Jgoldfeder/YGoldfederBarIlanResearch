@@ -1,0 +1,18 @@
+MODULE main
+DEFINE 
+size := 2;
+VAR
+x : 0 .. size;
+y : 0 .. size;
+ASSIGN
+init(x) := 0;
+init(y) := 0;
+next(x) := case
+x <= 0 & x != size : x+1;
+TRUE : 0;
+esac;
+next(y) := case
+y <= 0 & y != size: y+1;
+TRUE : 0;
+esac;
+LTLSPEC G x = y;

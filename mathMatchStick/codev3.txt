@@ -1,0 +1,142 @@
+--a matchstick digit has 7 slots where matches can be
+--we will use the following naming scheme:
+--     t
+--  l1   r1
+--     m
+--  l2   r2
+--     b
+--n is the number this digit represents. All numbers greater than 9 or less than 0 will be interpretted arbitrarily
+MODULE digit1(n)
+VAR
+t : boolean;
+m : boolean;
+b : boolean;
+l1 : boolean;
+l2 : boolean;
+r1 : boolean;
+r2 : boolean;
+
+DEFINE
+--useful to determine what number if any is currently being represented by these matches
+zero := t & !m & b & l1 & l2 & r1 & r2;
+one := !t & !m & !b & !l1 & !l2 & r1 & r2;
+two := t & m & b & !l1 & l2 & r1 & !r2;
+three := t & m & b & !l1 & !l2 & r1 & r2;
+four := !t & m & !b & l1 & !l2 & r1 & r2;
+five := t & m & b & l1 & !l2 & !r1 & r2;
+six := t & m & b & l1 & l2 & !r1 & r2;
+seven := t & !m & !b & !l1 & !l2 & r1 & r2;
+eight := t & m & b & l1 & l2 & r1 & r2;
+nine := t & m & b & l1 & !l2 & r1 & r2;
+
+--number of matches in this digit model
+total := (t ? 1 : 0) + (m ? 1 : 0) + (b ? 1 : 0) + (l1 ? 1 : 0) + (l2 ? 1 : 0) + (r1 ? 1 : 0) + (r2 ? 1 : 0);
+
+--number of matches we began with
+initial := case
+n=0 : 6;
+n=1 : 2;
+n=2 : 5;
+n=3 : 5;
+n=4 : 4;
+n=5 : 5;
+n=6 : 6;
+n=7 : 3;
+n=8 : 7;
+n=9 : 6;
+TRUE : 1000; --really this means its undefined
+esac;
+
+--number of matches added or subtracted to the system,, to be used by the mainmodule to maintain a zero sum of the offsets of all digits
+offset :=  total - initial;
+
+--integral representaion of this digits value. if the number is not a digit, value is unspecified
+value := case
+zero : 0;
+one : 1;
+two : 2;
+three : 3;
+four : 4;
+five : 5;
+six : 6;
+seven : 7;
+eight : 8;
+nine : 9;
+TRUE : -1;
+esac;
+
+--we also want a way of telling how many matches moved
+--to do this, we first define what the matches were originally based on the value of n
+--we added an i before each match slot  name to denote this is its initial value
+--before each slot there is a comment listing the digits in which they appear 
+--02356789
+it := case
+n=1 | n=4: FALSE;
+TRUE : TRUE;
+esac;
+--2345689
+im := case
+n=1 |n=7 | n=0 : FALSE;
+TRUE : TRUE;
+esac;
+--0235689
+ib := case
+n=1 |n=4 | n=7 : FALSE;
+TRUE : TRUE;
+esac;
+--045689
+il1 := case
+n=1 |n=2 | n=3 | n=7 : FALSE;
+TRUE : TRUE;
+esac;
+--0268
+il2 := case
+n=0 |n=2 | n=6 | n=8 : TRUE;
+TRUE : FALSE;
+esac;
+--01234789
+ir1 := case
+n=5 | n=6 : FALSE;
+TRUE : TRUE;
+esac;
+--013456789
+ir2 := case
+n=2 : FALSE;
+TRUE : TRUE;
+esac;
+
+--now see how which ones moved
+mt := (it & !t) ? 1 : 0;
+mm := (im & !m) ? 1 : 0;
+mb := (ib & !b) ? 1 : 0;
+ml1 := (il1 & !l1) ? 1 : 0;
+ml2 := (il2 & !l2) ? 1 : 0;
+mr1 := (ir1 & !r1) ? 1 : 0;
+mr2 := (ir2 & !r2) ? 1 : 0;
+--and add them
+moved := mt + mm + mb + ml1 + ml2 + mr1 + mr2;
+
+--the matches in this operator are stationary, as a single slash would not have meaning (could be division in theory but that us not suported
+MODULE multiplyOperator(leftOperand,rightOperand)
+DEFINE
+offset := 0;
+moved := 0;
+value := leftOperand.value * rightOperand.value;
+
+
+
+
+MODULE operator(is_plus,leftOperand,rightOperand)
+VAR
+--only supported operators are plus and minus. Thus, the operator must always have a horizontal match (minus), and may have a vertical one as well (plus)
+vertical : boolean;
+DEFINE
+initial := is_plus ? 1 : 0;
+total := vertical ? 1 : 0;
+offset := total - initial;
+moved := (is_plus & !vertical) ? 1 : 0;
+value := vertical ? (leftOperand.value + rightOperand.value) : (leftOperand.value - rightOperand.value);
+MODULE main
+
+DEFINE
+

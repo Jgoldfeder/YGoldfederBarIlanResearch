@@ -1,0 +1,54 @@
+--This program solves the classic river crossing puzzle. 
+--The farmer is on the left bank and wants to get to the right bank.  
+MODULE main
+VAR
+fox : {left,right};
+goose : {left,right};
+beans : {left,right};
+farmer : {left,right};
+next_item : {f,g,b,nothing};
+ASSIGN
+init(fox) := left;
+init(goose) := left;
+init(beans) := left;
+init(farmer) := left;
+init(next_item) := {f,g,b};
+
+--the farmer always crosses the river, unless all his stuff is already on the right side, in which case he remains there indefinately
+next(farmer) := case
+(fox = right) & (goose = right) & (beans = right) : right;
+TRUE : farmer = left ? right : left;
+esac;
+
+
+next(next_item) := case
+fox = next(farmer) : f;
+TRUE : nothing;
+esac union
+case
+goose = next(farmer) : g;
+TRUE : nothing;
+esac union
+case
+beans = next(farmer) : b;
+TRUE : nothing;
+esac union nothing;
+
+next(goose) := case
+next_item = g: next(farmer);
+TRUE : goose;
+esac;
+next(fox) := case
+next_item = f: next(farmer);
+TRUE : fox;
+esac;
+next(beans) := case
+next_item = b: next(farmer);
+TRUE : beans;
+esac;
+DEFINE
+constraint1 := !(((farmer = right) & (goose = left) & (beans = left)) | ((farmer = left) & (goose = right) & (beans = right)) );
+constraint2 := !(((farmer = right) & (goose = left) & (fox = left)) | ((farmer = left) & (goose = right) & (fox = right)) );
+goal := (goose = right) & (beans = right) & (fox = right) & (farmer = right);
+
+LTLSPEC G(constraint1 & constraint2) -> G(!goal);

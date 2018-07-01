@@ -1,0 +1,208 @@
+--a matchstick digit has 7 slots where matches can be
+--we will use the following naming scheme:
+--     t
+--  l1   r1
+--     m
+--  l2   r2
+--     b
+--n is the number this digit represents. All numbers greater than 9 or less than 0 will be interpretted arbitrarily
+MODULE digit(n)
+VAR
+t : boolean;
+m : boolean;
+b : boolean;
+l1 : boolean;
+l2 : boolean;
+r1 : boolean;
+r2 : boolean;
+--offset counts number of matches we have added or subtracted from this digit, used tin the main module to constrain the system to a zero sum.
+offset : -10..10;
+--the match to move. Enum names are the same as above but with an m for 'match' appended to distinguish from the above identifiers
+move : {mt,mm,mb,ml1,ml2,mr1,mr2, none};
+empty : {mt,mm,mb,ml1,ml2,mr1,mr2, none};
+ASSIGN
+--initially, we have not added any matches to the digit
+init(offset) := 0;
+
+--before each slot there is a comment listing the digits in which they appear 
+--02356789
+init(t) := case
+n=1 | n=4: FALSE;
+TRUE : TRUE;
+esac;
+--2345689
+init(m) := case
+n=1 |n=7 | n=0 : FALSE;
+TRUE : TRUE;
+esac;
+--0235689
+init(b) := case
+n=1 |n=4 | n=7 : FALSE;
+TRUE : TRUE;
+esac;
+--045689
+init(l1) := case
+n=1 |n=2 | n=3 | n=7 : FALSE;
+TRUE : TRUE;
+esac;
+--0268
+init(l2) := case
+n=0 |n=2 | n=6 | n=8 : TRUE;
+TRUE : FALSE;
+esac;
+--01234789
+init(r1) := case
+n=5 | n=6 : FALSE;
+TRUE : TRUE;
+esac;
+--013456789
+init(r2) := case
+n=2 : FALSE;
+TRUE : TRUE;
+esac;
+
+--all matches that exist are moveable
+init(move) := 
+(t ? mt : none )union
+(m ? mm : none) union
+(l1 ? ml1 : none) union
+(l2 ? ml2 : none) union
+(r1 ? mr1 : none) union
+(r2 ? mr2 : none) union
+(b ? mb : none) union
+none;
+
+--the rest are empty slots
+init(empty) := 
+(!t ? mt : none) union
+(!m ? mm : none) union
+(!l1 ? ml1 : none) union
+(!l2 ? ml2 : none) union
+(!r1 ? mr1 : none) union
+(!r2 ? mr2 : none) union
+(!b ? mb : none) union
+none;
+
+--update them for the next state
+next(move) := 
+(next(t) ? mt : none )union
+(next(m) ? mm : none) union
+(next(l1) ? ml1 : none) union
+(next(l2) ? ml2 : none) union
+(next(r1) ? mr1 : none) union
+(next(r2) ? mr2 : none) union
+(next(b) ? mb : none) union
+none;
+
+next(empty) := 
+(next(!t) ? mt : none) union
+(next(!m) ? mm : none) union
+(next(!l1) ? ml1 : none) union
+(next(!l2) ? ml2 : none) union
+(next(!r1) ? mr1 : none) union
+(next(!r2) ? mr2 : none) union
+(next(!b) ? mb : none) union
+none;
+
+
+
+--if this match is the one moving, set it its current spot to false and set the empty spot we want to fill to true.
+--we can also remove or add matches, but then the number we offset from all digits in the system when totalled must cancel out to zero
+next(t) := case
+(empty = none) : t;
+(move = none) : t;
+move = mt : FALSE;
+empty = mt : TRUE;
+TRUE : t;
+esac;
+next(m) := case
+(empty = none) : m;
+(move = none) : m;
+
+move = mm : FALSE;
+empty = mm : TRUE;
+TRUE : m;
+esac;
+next(b) := case
+(empty = none) : b;
+(move = none) : b;
+
+move = mb : FALSE;
+empty = mb : TRUE;
+TRUE : b;
+esac;
+next(l1) := case
+(empty = none) : l1;
+(move = none) : l1;
+
+move = ml1 : FALSE;
+empty = ml1 : TRUE;
+TRUE : l1;
+esac;
+next(l2) := case
+(empty = none) : l2;
+(move = none) : l2;
+
+move = ml2 : FALSE;
+empty = ml2 : TRUE;
+TRUE : l2;
+esac;
+next(r1) := case
+(empty = none) : r1;
+(move = none) : r1;
+
+move = mr1 : FALSE;
+empty = mr1 : TRUE;
+TRUE : r1;
+esac;
+next(r2) := case
+(empty = none) : r2;
+(move = none) : r2;
+
+move = mr2 : FALSE;
+empty = mr2 : TRUE;
+TRUE : r2;
+esac;
+
+--next offset 
+next(offset) := 0; --offset + (move=none ? 1 : 0) + (empty = none ? -1 : 0);
+
+
+DEFINE
+zero := t & !m & b & l1 & l2 & r1 & r2;
+one := !t & !m & !b & !l1 & !l2 & r1 & r2;
+two := t & m & b & !l1 & l2 & r1 & !r2;
+three := t & m & b & !l1 & !l2 & r1 & r2;
+four := !t & m & !b & l1 & !l2 & r1 & r2;
+five := t & m & b & l1 & !l2 & !r1 & r2;
+six := t & m & b & l1 & l2 & !r1 & r2;
+seven := t & !m & !b & !l1 & !l2 & r1 & r2;
+eight := t & m & b & l1 & l2 & r1 & r2;
+nine := t & m & b & l1 & !l2 & r1 & r2;
+no_match := !t & !m & !b & !l1 & !l2 & !r1 & !r2;
+--integral representaion of this digits value. if the number is not a digit, value is unsoecified
+value := case
+zero : 0;
+one : 1;
+two : 2;
+three : 3;
+four : 4;
+five : 5;
+six : 6;
+seven : 7;
+eight : 8;
+nine : 9;
+TRUE : -1;
+esac;
+MODULE main
+--for now assume operator is minus
+VAR
+leftOperand : digit(1);
+rightOperand : digit(2);
+result : digit(3);
+DEFINE
+--if either operand is -1 that means it is not currently a number
+goal := ((leftOperand.value - result.value) = 1) & (leftOperand.value != -1) & (result.value!= -1) & (rightOperand.value != -1);
+--we also want to allow switching of matches from all 3 digits
+ASSIGN
+LTLSPEC G !goal;
