@@ -28,72 +28,72 @@ next(mNum) := mNum=6? 6 : mNum + 1;
 
 next(matches[0]) := case 
 move = 0 : matches[0 + direction];
-move = 0 + direction : matches[0 + direction*2];
-move = 0 + direction*2 : TRUE;
-move = 0 + direction*3 : TRUE;
+move = 0 - direction : matches[0 + direction];
+move = 0 - direction*2 : TRUE;
+move = 0 - direction*3 : TRUE;
 TRUE : matches[0];
 esac;
 next(matches[1]) := case 
 move = 1 : matches[1 + direction];
-move = 1 + direction : matches[1 + direction*2];
-move = 1 + direction*2 : TRUE;
-move = 1 + direction*3 : TRUE;
+move = 1 - direction : matches[1 + direction];
+move = 1 - direction*2 : TRUE;
+move = 1 - direction*3 : TRUE;
 TRUE : matches[1];
 esac;
 next(matches[2]) := case 
 move = 2 : matches[2 + direction];
-move = 2 + direction : matches[2 + direction*2];
-move = 2 + direction*2 : TRUE;
-move = 2 + direction*3 : TRUE;
+move = 2 - direction : matches[2 + direction];
+move = 2 - direction*2 : TRUE;
+move = 2 - direction*3 : TRUE;
 TRUE : matches[2];
 esac;
 next(matches[3]) := case 
 move = 3 : matches[3 + direction];
-move = 3 + direction : matches[3 + direction*2];
-move = 3 + direction*2 : TRUE;
-move = 3 + direction*3 : TRUE;
+move = 3 - direction : matches[3 + direction];
+move = 3 - direction*2 : TRUE;
+move = 3 - direction*3 : TRUE;
 TRUE : matches[3];
 esac;next(matches[04]) := case 
 move = 04 : matches[04 + direction];
-move = 04 + direction : matches[04 + direction*2];
-move = 04 + direction*2 : TRUE;
-move = 04 + direction*3 : TRUE;
+move = 04 - direction : matches[04 + direction];
+move = 04 - direction*2 : TRUE;
+move = 04 - direction*3 : TRUE;
 TRUE : matches[04];
 esac;
 next(matches[05]) := case 
 move = 05 : matches[05 + direction];
-move = 05 + direction : matches[05 + direction*2];
-move = 05 + direction*2 : TRUE;
-move = 05 + direction*3 : TRUE;
+move = 05 - direction : matches[05 + direction];
+move = 05 - direction*2 : TRUE;
+move = 05 - direction*3 : TRUE;
 TRUE : matches[05];
 esac;
 next(matches[06]) := case 
 move = 06 : matches[06 + direction];
-move = 06 + direction : matches[06 + direction*2];
-move = 06 + direction*2 : TRUE;
-move = 06 + direction*3 : TRUE;
+move = 06 - direction : matches[06 + direction];
+move = 06 - direction*2 : TRUE;
+move = 06 - direction*3 : TRUE;
 TRUE : matches[06];
 esac;
 
 next(matches[07]) := case 
 move = 07 : matches[07 + direction];
-move = 07 + direction : matches[07 + direction*2];
-move = 07 + direction*2 : TRUE;
-move = 07 + direction*3 : TRUE;
+move = 07 - direction : matches[07 + direction];
+move = 07 - direction*2 : TRUE;
+move = 07 - direction*3 : TRUE;
 TRUE : matches[07];
 esac;
 next(matches[08]) := case 
 move = 08 : matches[08 + direction];
-move = 08 + direction : matches[08 + direction*2];
-move = 08 + direction*2 : TRUE;
-move = 08 + direction*3 : TRUE;
+move = 08 - direction : matches[08 + direction];
+move = 08 - direction*2 : TRUE;
+move = 08 - direction*3 : TRUE;
 TRUE : matches[08];
 esac;
 next(matches[09]) := case 
 move = 09 : matches[09 + direction];
-move = 09 + direction : matches[09 + direction*2];
-move = 09 + direction*2 : TRUE;
-move = 09 + direction*3 : TRUE;
+move = 09 - direction : matches[09 + direction];
+move = 09 - direction*2 : TRUE;
+move = 09 - direction*3 : TRUE;
 TRUE : matches[09];
 esac;
 
