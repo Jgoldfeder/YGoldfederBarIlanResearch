@@ -18,7 +18,7 @@ T  T  T   T
 because the crossed matches at 1 and 2 are shifted to 0 and 1, and the matches at 2 and 3 are set to true to signify them becoming crossed. The model uses a move counter to limit solutions to n/2 moves.
 
 Results:
-The program found that there is no solution for cases n = 4 and n = 6. For cases n=8.n=10,n=12,n=14.,n=16 and n=18, a solution was found. Using an inductive argument, it is clear from these results than for any n>6 where n is even, there is a solution. Any n above 18 can be broken up into x sets of 10 and one set of 10-18. For example, 70 can be broken into 6 tens and one 18, and 40 can be broken into 4 tens, and 26 would be one ten and a 16. Thus, we have proven that for n> 6, n is even, the riddle has a solution, and for n<=6, there is no solution.
+The program found that there is no solution for cases n = 4 and n = 6. For cases n=8, there is a solution. Using induction, the program can reduce an n match problem to an n-2 match problem, when n is larger than 10. Thus there is a solution for all n >=8.
 
 
 Program and results by Judah Goldfeder.

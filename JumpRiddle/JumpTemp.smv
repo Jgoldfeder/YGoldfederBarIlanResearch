@@ -1,17 +1,15 @@
 MODULE main
 VAR
---model consists of 18 potential slots for matches, which can either contain a single match, as is the initial state, contain two matches, or no matches.
---slots are 0-17, augmented 3 at either end to allow overflow
+--model consists of 8 potential slots for matches, which can either contain a single match, as is the initial state, contain two matches, or no matches.
+--slots are 0-7, augmented 3 at either end to allow overflow
 --true signifies this match is crossed, false signifies uncrossed. Two crossed matches are represented as two consecutive slots in the array marked true
-matches : array -3..20 of boolean;
-move : 0..17;
+matches : array -3..10 of boolean;
+move : 0..7;
 direction : {-1,1};
-mNum : 0..10;
 DEFINE
 --goal is all matches are crossed
-goal :=(TRUE & matches[0] & matches[1] & matches[2] & matches[3] & matches[4] & matches[5] & matches[6] & matches[7] & matches[8] & matches[9] & matches[10] & matches[11] & matches[12] & matches[13] & matches[14] & matches[15] & matches[16] & matches[17]);
+goal :=(TRUE & matches[0] & matches[1] & matches[2] & matches[3] & matches[4] & matches[5] & matches[6] & matches[7]);
 ASSIGN
-init(mNum) := 0;
 init(matches[0]) :=  FALSE;
 init(matches[1]) :=  FALSE;
 init(matches[2]) :=  FALSE;
@@ -20,17 +18,6 @@ init(matches[4]) :=  FALSE;
 init(matches[5]) :=  FALSE;
 init(matches[6]) :=  FALSE;
 init(matches[7]) :=  FALSE;
-init(matches[8]) :=  FALSE;
-init(matches[9]) :=  FALSE;
-init(matches[10]) :=  FALSE;
-init(matches[11]) :=  FALSE;
-init(matches[12]) :=  FALSE;
-init(matches[13]) :=  FALSE;
-init(matches[14]) :=  FALSE;
-init(matches[15]) :=  FALSE;
-init(matches[16]) :=  FALSE;
-init(matches[17]) :=  FALSE;
-next(mNum) := mNum=10? 10 : mNum + 1;
 next(matches[0]) := case
 move = 0 : matches[0 + direction];
 move = 0 - direction : matches[0 + direction];
@@ -95,84 +82,4 @@ move = 7 - direction*3 : TRUE;
 TRUE : matches[7];
 esac;
 
-next(matches[8]) := case
-move = 8 : matches[8 + direction];
-move = 8 - direction : matches[8 + direction];
-move = 8 - direction*2 : TRUE;
-move = 8 - direction*3 : TRUE;
-TRUE : matches[8];
-esac;
-
-next(matches[9]) := case
-move = 9 : matches[9 + direction];
-move = 9 - direction : matches[9 + direction];
-move = 9 - direction*2 : TRUE;
-move = 9 - direction*3 : TRUE;
-TRUE : matches[9];
-esac;
-
-next(matches[10]) := case
-move = 10 : matches[10 + direction];
-move = 10 - direction : matches[10 + direction];
-move = 10 - direction*2 : TRUE;
-move = 10 - direction*3 : TRUE;
-TRUE : matches[10];
-esac;
-
-next(matches[11]) := case
-move = 11 : matches[11 + direction];
-move = 11 - direction : matches[11 + direction];
-move = 11 - direction*2 : TRUE;
-move = 11 - direction*3 : TRUE;
-TRUE : matches[11];
-esac;
-
-next(matches[12]) := case
-move = 12 : matches[12 + direction];
-move = 12 - direction : matches[12 + direction];
-move = 12 - direction*2 : TRUE;
-move = 12 - direction*3 : TRUE;
-TRUE : matches[12];
-esac;
-
-next(matches[13]) := case
-move = 13 : matches[13 + direction];
-move = 13 - direction : matches[13 + direction];
-move = 13 - direction*2 : TRUE;
-move = 13 - direction*3 : TRUE;
-TRUE : matches[13];
-esac;
-
-next(matches[14]) := case
-move = 14 : matches[14 + direction];
-move = 14 - direction : matches[14 + direction];
-move = 14 - direction*2 : TRUE;
-move = 14 - direction*3 : TRUE;
-TRUE : matches[14];
-esac;
-
-next(matches[15]) := case
-move = 15 : matches[15 + direction];
-move = 15 - direction : matches[15 + direction];
-move = 15 - direction*2 : TRUE;
-move = 15 - direction*3 : TRUE;
-TRUE : matches[15];
-esac;
-
-next(matches[16]) := case
-move = 16 : matches[16 + direction];
-move = 16 - direction : matches[16 + direction];
-move = 16 - direction*2 : TRUE;
-move = 16 - direction*3 : TRUE;
-TRUE : matches[16];
-esac;
-
-next(matches[17]) := case
-move = 17 : matches[17 + direction];
-move = 17 - direction : matches[17 + direction];
-move = 17 - direction*2 : TRUE;
-move = 17 - direction*3 : TRUE;
-TRUE : matches[17];
-esac;
-
-LTLSPEC G !(goal &(mNum=9));
+LTLSPEC G !(goal);

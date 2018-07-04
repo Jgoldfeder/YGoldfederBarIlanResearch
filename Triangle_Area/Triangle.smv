@@ -1,0 +1,49 @@
+MODULE triangle(s1,s2,s3)
+VAR
+activated : boolean;
+si1 : boolean;
+si2 : boolean;
+si3 : boolean;
+ASSIGN
+init(activated) := TRUE;
+next(activated) := (s1.activated |si1) & (s2.activated | si2) & (s3.activated| si3);
+next(si1):= si1;
+next(si2) := si2;
+next(si3) := si3;
+DEFINE
+matches :=  (si1 = TRUE ? 1:0) + (si2= TRUE ? 1:0) +  (si3 = TRUE ? 1:0);
+area := activated ? 1 : 0;
+
+MODULE edge(active)
+DEFINE
+activated := active;
+
+
+MODULE main
+VAR
+deadEdge : edge(FALSE);
+liveEdge : edge(TRUE);
+t0 : triangle(deadEdge,deadEdge,t2);
+t1 : triangle(deadEdge,t2,t5);
+t2 : triangle(t0,t1,t3);
+t3 : triangle(deadEdge,t2,t7);
+t4 : triangle(deadEdge,t10,t5);
+t5 : triangle(t1,t4,t6);
+t6 : triangle(t12,t7,t5);
+t7 : triangle(t6,t3,t8);
+t8 : triangle(deadEdge,t7,t14);
+t9 : triangle(deadEdge,deadEdge,t10);
+t10 : triangle(t9,t4,t11);
+t11 : triangle(deadEdge,t10,t12);
+t12 : triangle(t11,t6,t13);
+t13 : triangle(deadEdge,t12,t14);
+t14 : triangle(t8,t13,t15);
+t15 : triangle(deadEdge,deadEdge,t14);
+DEFINE
+total := t0.matches + t1.matches + t2.matches+ t3.matches+ t4.matches+ t5.matches+ t6.matches+ t7.matches+ t8.matches+ t9.matches+ t10.matches+ t11.matches+ t12.matches+ t13.matches+ t14.matches+ t15.matches;
+activeTotal := t0.area + t1.area+ t2.area+ t3.area+ t4.area+ t5.area+ t6.area+ t7.area+ t8.area+ t9.area+ t10.area+ t11.area
++ t12.area+ t13.area+ t14.area+ t15.area;
+
+
+
+SPEC  !(EG (total<=8)& AG !(activeTotal < 11));

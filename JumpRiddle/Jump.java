@@ -15,25 +15,29 @@ public class Jump{
         
         
         String fileName = "JumpTemp.smv";
-        solver.stringToFile(solver.buildCode(),fileName);
-        solver.runNuSMV(fileName,verbose);
+        while(solver.matchNumber > 8){
+            solver.reduceSolution().print();
+        }       
+        solver.stringToFile(solver.buildCode()+solver.buildLTLSolutionString(),fileName);
+        solver.runNuSMV(fileName,verbose).print();
+    
+    }
+   
+    private Solution runNuSMV(String fileName,boolean verbose)throws Exception{
+        return runNuSMV(fileName,verbose,matchNumber/2);
     }
     
     //runs nusmv, adding the solution it finds (or if no solution, the String "no solution") to the solution ArrayList
-    private void runNuSMV(String fileName,boolean verbose)throws IOException{        
+    private Solution runNuSMV(String fileName,boolean verbose,int numberOfSteps)throws Exception{        
         Runtime rt = Runtime.getRuntime();
-        Process pr = rt.exec("nusmv "+fileName);   
-        BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));        
-        
-        String line=null;
-        //if an arg is -v for verbose, print out nusmv results instead of parsed results
-        if(verbose){
-            while((line=input.readLine()) != null) {
-                System.out.println(line);
-            }
-            return;
+        Process pr = rt.exec("nusmv -bmc -bmc_length "+numberOfSteps+" "+fileName);   
+        BufferedReader input = new BufferedReader(new InputStreamReader(pr.getErrorStream()));    
+        //clear error buffer
+        String line=null; 
+           while((line=input.readLine()) != null){
         }
         
+        input = new BufferedReader(new InputStreamReader(pr.getInputStream()));    
         boolean foundSolution = false;
         Solution solution = new Solution();
         solutions.add(solution);
@@ -42,7 +46,12 @@ public class Jump{
         int state = 0;
         int direction = 0;
         int index = 0;
-        while((state <= matchNumber/2) && ((line=input.readLine()) != null)){                
+
+        
+        
+     
+        
+        while((state <= numberOfSteps) && ((line=input.readLine()) != null)){                
             if(line.startsWith("  -> State:")){
                 //increment state counter
                 if(state > 0){
@@ -56,19 +65,23 @@ public class Jump{
             }
             if(line.startsWith("    move = ")){
                 index = Integer.parseInt(line.substring(11));
-            }
+            }   
         
         }
-        solution.print();
+        return solution;
     }
     
     private void stringToFile(String s,String fileName)throws Exception{
         PrintWriter writer = new PrintWriter(fileName, "UTF-8");
         writer.print(s);
-        writer.close();
-        
+        writer.close();       
     }
-    private String buildCode()throws Exception{ 
+    
+    private String buildCode()throws Exception{
+        return buildCode(matchNumber/2);
+    }
+    
+    private String buildCode(int numberOfMoves)throws Exception{ 
         return
         "MODULE main\n"+
         "VAR\n"+
@@ -78,16 +91,12 @@ public class Jump{
         "matches : array -3.."+(matchNumber+2)+" of boolean;\n"+
         "move : 0.."+(matchNumber-1)+";\n"+
         "direction : {-1,1};\n"+
-        "mNum : 0.."+(matchNumber/2+1)+";\n"+
         "DEFINE\n"+
         "--goal is all matches are crossed\n"+
         buildGoal()+            
         "ASSIGN\n"+
-        "init(mNum) := 0;\n"+
         buildInit()+
-        "next(mNum) := mNum="+(matchNumber/2+1)+"? "+(matchNumber/2+1)+" : mNum + 1;\n"+
-        buildNext()+
-        "LTLSPEC G !(goal &(mNum="+(matchNumber/2)+"));\n";
+        buildNext();
     }
     private String readFile(String file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader (file));
@@ -138,6 +147,21 @@ public class Jump{
         return next;
     }
     
+    //reduce solution from n to n-2 
+    private Solution reduceSolution()throws Exception{
+        String fileName = "JumpTemp.smv";
+        String reductionLTLSpec = "LTLSPEC G !(matches["+(matchNumber-1)+"] & matches["+(matchNumber-2)+"]);\n";
+        stringToFile(buildCode(1)+reductionLTLSpec,fileName);
+        matchNumber-=2;
+        return runNuSMV(fileName,false,1);       
+    }
+    
+    private String buildLTLSolutionString(){
+        return "LTLSPEC G !(goal);\n";
+    }
+    
+    
+    
     
     //class encapsulating a solution
     private class Solution{
@@ -157,14 +181,6 @@ public class Jump{
             System.out.println(s);
         }
         
+        
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }

@@ -1,0 +1,1 @@
+This solves the problem of how many triangles, when arranged as shown in the acompanying png file, can 8 matches enclose. The nusmv program can not say where the matches are, but returns true or false if the number of triangles asserted in the goal can indeed be covered.
